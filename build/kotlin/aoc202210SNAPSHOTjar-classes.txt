@@ -1,1 +1,0 @@
-/Users/robert.williams/IdeaProjects/aoc2022/build/classes/kotlin/main/day1/Day1MainKt.class:/Users/robert.williams/IdeaProjects/aoc2022/build/classes/kotlin/main/day2/Day2MainKt.class
