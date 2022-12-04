@@ -1,17 +1,10 @@
+package day1
+
 import kotlin.collections.ArrayList
 import java.io.File
-import java.io.InputStream
-import java.util.*
 
 fun main() {
-
-    println("Hello, Kotlin World!")
-    val inputStream: InputStream = File("scratch_folder/input.txt").inputStream()
-
-    val inputString = inputStream.bufferedReader().use { it.readText() }
-    println(inputString)
-
-    val bufferedReader = File("scratch_folder/input.txt").bufferedReader()
+    val bufferedReader = File("scratch_folder/day1-input.txt").bufferedReader()
 
     val elvesAndBags: ArrayList<ArrayList<Long>> = ArrayList()
     elvesAndBags.add(ArrayList())
@@ -40,7 +33,8 @@ fun main() {
         getElfCalories(elf2).compareTo(getElfCalories(elf1)) }
 
     elvesAndBags.sortedWith(calorieComparator).asSequence().take(3).forEach {
-        bigThree += getElfCalories(it)}
+        bigThree += getElfCalories(it)
+    }
 
     println("Biggest Elf Calories are: $biggestElfCal")
     println("Biggest Elf Calories are: $bigThree")
