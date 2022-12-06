@@ -1,8 +1,12 @@
 package day2
 
 import java.io.File
+import java.util.*
 
 var codeMap: MutableMap<String, Selection> = HashMap()
+var selectionValueMap: MutableMap<SelectionType, Int> = EnumMap(SelectionType::class.java)
+var aBeatsB: MutableMap<SelectionType, SelectionType> = EnumMap(SelectionType::class.java)
+var aIsBeatenByB: MutableMap<SelectionType, SelectionType> = EnumMap(SelectionType::class.java)
 
 const val DRAW: Int = 3
 const val WIN: Int = 6
@@ -19,25 +23,39 @@ data class Round( val roundIndex: Int,
 data class RoundOutcome (var opponentScore: Int = 0,
                          var meScore: Int = 0)
 
-data class Selection (val selection: SelectionType,
-                      val selectionValue: Int = 0)
+data class Selection (var selection: SelectionType,
+                      var intent: SelectionType)
 
 enum class SelectionType
 {
     ROCK,
     PAPER,
-    SCISSORS
+    SCISSORS,
+    LOSE,
+    WIN,
+    DRAW
 }
 
 fun main() {
-    codeMap["A"] = Selection(SelectionType.ROCK, 1)
-    codeMap["B"] = Selection(SelectionType.PAPER, 2)
-    codeMap["C"] = Selection(SelectionType.SCISSORS, 3)
-    codeMap["X"] = Selection(SelectionType.ROCK, 1)
-    codeMap["Y"] = Selection(SelectionType.PAPER, 2)
-    codeMap["Z"] = Selection(SelectionType.SCISSORS, 3)
+    codeMap["A"] = Selection(SelectionType.ROCK,SelectionType.ROCK)
+    codeMap["B"] = Selection(SelectionType.PAPER,SelectionType.PAPER)
+    codeMap["C"] = Selection(SelectionType.SCISSORS, SelectionType.SCISSORS)
+    codeMap["X"] = Selection(SelectionType.LOSE, SelectionType.LOSE)
+    codeMap["Y"] = Selection(SelectionType.DRAW, SelectionType.DRAW)
+    codeMap["Z"] = Selection(SelectionType.WIN, SelectionType.WIN)
+    aBeatsB[SelectionType.SCISSORS] = SelectionType.PAPER
+    aBeatsB[SelectionType.PAPER] = SelectionType.ROCK
+    aBeatsB[SelectionType.ROCK] = SelectionType.SCISSORS
+    aIsBeatenByB[SelectionType.SCISSORS] = SelectionType.ROCK
+    aIsBeatenByB[SelectionType.PAPER] = SelectionType.SCISSORS
+    aIsBeatenByB[SelectionType.ROCK] = SelectionType.PAPER
+    selectionValueMap[SelectionType.ROCK] = 1
+    selectionValueMap[SelectionType.PAPER] = 2
+    selectionValueMap[SelectionType.SCISSORS] = 3
+
 
     val bufferedReader = File("scratch_folder/day2-input.txt").bufferedReader()
+//    val bufferedReader = File("scratch_folder/day2-scratch-input.txt").bufferedReader()
     val games: MutableList<Game> = ArrayList()
     var gameIndex = 0
     var roundIndex = 0
@@ -53,10 +71,10 @@ fun main() {
 
             val roundCodes = it.split(" ")
 
-            val round = Round(roundIndex++, codeMap[roundCodes[0]]!!,codeMap[roundCodes[1]]!!)
+            val round = Round(roundIndex++, codeMap[roundCodes[0]]!!.copy(),codeMap[roundCodes[1]]!!.copy())
             game.round.add( round )
 
-            calculateRoundOutcomes(round)
+            calculateRoundOutcomesPuzzle2(round)
         }
     }
 
@@ -71,6 +89,7 @@ fun main() {
         game.round.forEach { round ->
             println("Round #${round.roundIndex}")
             println ("I play ${round.me.selection.name} vs opponent's ${round.opponent.selection.name}")
+            println("I intended to ${round.me.intent} and my score increased by ${round.outcome.meScore}")
             myGameScore += round.outcome.meScore
             opponentGameScore += round.outcome.opponentScore
         }
@@ -86,7 +105,7 @@ fun main() {
     println("My Total Tournament Score: $myTournamentScore")
 }
 
-fun calculateRoundOutcomes(round: Round) {
+fun calculateRoundOutcomesPuzzle1(round: Round) {
     if(round.me.selection == round.opponent.selection)
     {
         round.outcome.meScore = DRAW
@@ -102,6 +121,28 @@ fun calculateRoundOutcomes(round: Round) {
     {
         round.outcome.opponentScore = WIN
     }
-    round.outcome.meScore += round.me.selectionValue
-    round.outcome.opponentScore += round.opponent.selectionValue
+    round.outcome.meScore += selectionValueMap[round.me.selection]!!
+    round.outcome.opponentScore += selectionValueMap[round.opponent.selection]!!
 }
+
+fun calculateRoundOutcomesPuzzle2(round: Round) {
+    if(round.me.selection == SelectionType.DRAW)
+    {
+        round.outcome.meScore = DRAW
+        round.outcome.opponentScore = DRAW
+        round.me.selection = round.opponent.selection
+    }
+    else if (round.me.selection == SelectionType.WIN)
+    {
+        round.outcome.meScore = WIN
+        round.me.selection = aIsBeatenByB[round.opponent.selection]!!
+    }
+    else
+    {
+        round.outcome.opponentScore = WIN
+        round.me.selection = aBeatsB[round.opponent.selection]!!
+    }
+    round.outcome.meScore += selectionValueMap[round.me.selection]!!
+    round.outcome.opponentScore += selectionValueMap[round.opponent.selection]!!
+}
+
