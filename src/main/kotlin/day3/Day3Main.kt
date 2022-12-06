@@ -1,6 +1,5 @@
 package day3
 
-import day2.Game
 import java.io.File
 
 var rucksack: ArrayList<Array<Compartment>> = ArrayList()
@@ -12,10 +11,7 @@ data class CompartmentItem(var count: Int)
 
 fun main() {
     val bufferedReader = File("scratch_folder/day3-scratch-input.txt").bufferedReader()
-    val games: MutableList<Game> = ArrayList()
-    var gameIndex = 0
-    var roundIndex = 0
-    games.add(Game(gameIndex, ArrayList()))
+
     bufferedReader.useLines { lines ->
         lines.forEach { it ->
             if (it.isEmpty()) {
