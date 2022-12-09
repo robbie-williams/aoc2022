@@ -6,7 +6,7 @@ Just another coder having a crack at https://adventofcode.com/2022 challenges
 | 1   | Complete    | Done        | Done        |
 | 2   | Complete    | Done        | Done        |
 | 3   | Complete    | Done        | Done        |
-| 4   | Not Started | Not Started | Not Started |
+| 4   | Started     | Done        | Not Started |
 | 5   | Not Started | Not Started | Not Started |
 | 6   | Not Started | Not Started | Not Started |
 | 7   | Not Started | Not Started | Not Started |
