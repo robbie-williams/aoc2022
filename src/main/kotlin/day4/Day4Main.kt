@@ -27,22 +27,33 @@ fun main() {
         }
     }
 
-    var coverageDuplicates = 0
+    var completeCoverageDuplicates = 0
+    var partialCoverageDuplicates = 0
     elfPairs.pairs.forEach { elfPair ->
-        if ( elfPair.pair.last().assignments.first in elfPair.pair.first().assignments &&
-                elfPair.pair.last().assignments.last in elfPair.pair.first().assignments )
-        {
-            println("found ${elfPair.pair.last().assignments} exists wholly within ${elfPair.pair.first().assignments}" )
-            coverageDuplicates++
+        if ( elfPair.pair.last().assignments.first in elfPair.pair.first().assignments ||
+            elfPair.pair.last().assignments.last in elfPair.pair.first().assignments ) {
+            partialCoverageDuplicates++
+            if (elfPair.pair.last().assignments.first in elfPair.pair.first().assignments &&
+                elfPair.pair.last().assignments.last in elfPair.pair.first().assignments
+            ) {
+                println("found ${elfPair.pair.last().assignments} exists wholly within ${elfPair.pair.first().assignments}")
+                completeCoverageDuplicates++
+            }
         }
 
-        else if ( elfPair.pair.first().assignments.first in elfPair.pair.last().assignments &&
-            elfPair.pair.first().assignments.last in elfPair.pair.last().assignments )
-        {
-            println("found ${elfPair.pair.first().assignments} exists wholly within ${elfPair.pair.last().assignments}" )
-            coverageDuplicates++
-        }
+        else if ( elfPair.pair.first().assignments.first in elfPair.pair.last().assignments ||
+                elfPair.pair.first().assignments.last in elfPair.pair.last().assignments )
+            {
+                partialCoverageDuplicates++
+                if ( elfPair.pair.first().assignments.first in elfPair.pair.last().assignments &&
+                    elfPair.pair.first().assignments.last in elfPair.pair.last().assignments )
+                {
+                    println("found ${elfPair.pair.first().assignments} exists wholly within ${elfPair.pair.last().assignments}" )
+                    completeCoverageDuplicates++
+                }
+            }
     }
 
-    println("------\nTotal duplicate coverage found: $coverageDuplicates")
+    println("------\nPart 1: Total duplicate coverage found: $completeCoverageDuplicates")
+    println("Part 2: Total Partial coverage found: $partialCoverageDuplicates")
 }
