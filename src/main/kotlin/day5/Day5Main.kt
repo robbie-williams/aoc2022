@@ -66,16 +66,7 @@ fun main() {
                                 //Execute Instruction when TO is loaded
                                 if(currentInstruction.instructionLoadingIndicator == InstructionLoadingIndicator.AMOUNT) {
                                     printDock(dock)
-                                    print(
-                                        "\nExecuting instruction to move " +
-                                                "${currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first} units from " +
-                                                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first } units to " +
-                                                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first }")
-                                    for (i in 1..currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first) {
-                                        val crate = dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first-1].crates.pop()
-                                        print("\nMoving crate: ${crate.crateLabel}")
-                                        dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first-1].crates.push(crate)
-                                    }
+                                    executeInstructionCrateMover9001(currentInstruction,dock)
                                 }
                             }
                         }
@@ -90,4 +81,40 @@ fun main() {
         print(bay.crates.peek().crateLabel)
     }
 
+}
+
+//Part 1
+fun executeInstructionCrateMover9000(currentInstruction: Instruction, dock: Dock) {
+    print(
+        "\nExecuting instruction to move " +
+                "${currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first} units from " +
+                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first } units to " +
+                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first }")
+
+    for (i in 1..currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first) {
+        val crate = dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first-1].crates.pop()
+        print("\nMoving crate: ${crate.crateLabel}")
+        dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first-1].crates.push(crate)
+    }
+}
+
+//Part 2
+fun executeInstructionCrateMover9001(currentInstruction: Instruction, dock: Dock) {
+    print(
+        "\nExecuting instruction to move " +
+                "${currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first} units from " +
+                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first } units to " +
+                "Bay ${currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first }")
+
+    val tempStack = Stack<Crate>()
+    for (i in 1..currentInstruction.instructionMap[InstructionLoadingIndicator.AMOUNT]!!.first) {
+        tempStack.push(dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.FROM]!!.first-1].crates.pop())
+    }
+
+    while( tempStack.isNotEmpty())
+    {
+        val crate = tempStack.pop()
+        print("\nMoving crate: ${crate.crateLabel}")
+        dock.loadingBays[currentInstruction.instructionMap[InstructionLoadingIndicator.TO]!!.first-1].crates.push(crate)
+    }
 }
