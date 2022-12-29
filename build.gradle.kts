@@ -27,7 +27,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    val main = "day4.Day4MainKt"
+    val main = "day7.Day7MainKt"
     println("loading $main")
     mainClass.set(main)
 }
