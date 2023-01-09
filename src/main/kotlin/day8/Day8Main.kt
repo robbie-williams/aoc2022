@@ -3,26 +3,37 @@ package day8
 import java.io.File
 
 data class Tree(
-    var coordinates: Pair<Int,Int>,
+//    var coordinates: Pair<Int,Int>,
+    val x: Int,
+    val y: Int,
     var height: Int,
-    var topVisible: Boolean = false,
-    var bottomVisible: Boolean = false,
-    var leftVisible: Boolean = false,
-    var rightVisible: Boolean = false
+    val visibility: MutableMap<VISIBILITY_PATH, Boolean> = mutableMapOf(
+        VISIBILITY_PATH.FROM_TOP to false,
+        VISIBILITY_PATH.FROM_BOTTOM to false,
+        VISIBILITY_PATH.FROM_LEFT to false,
+        VISIBILITY_PATH.FROM_RIGHT to false
+    )
 )
 {
     override fun toString(): String {
-        return "Tree(${coordinates.second}, ${coordinates.first}) - Height: $height, " +
-                "Top Visible: $topVisible, Bottom Visible: $bottomVisible, Left Visible: $leftVisible, " +
-                "Right Visible: $rightVisible"
+        return "Tree($x, $y) - Height: $height,  Visibility: " +
+                "${VISIBILITY_PATH.values().map { path ->  path.toString() + '=' + visibility[path]} }"
     }
 }
 
-fun main() {
-    val reader = File("scratch_folder/day8-scratch-input.txt").reader()
+enum class VISIBILITY_PATH
+{
+    FROM_TOP,
+    FROM_BOTTOM,
+    FROM_LEFT,
+    FROM_RIGHT
+}
 
-    var x = -1
-    var y = 0
+
+fun main() {
+    val reader = File("scratch_folder/day8-input.txt").reader()
+    var y = -1
+    var x = 0
     val trees = ArrayList<ArrayList<Tree>>()
     trees.add(ArrayList<Tree>())
     reader.use { inputStreamReader ->
@@ -31,33 +42,85 @@ fun main() {
             if (c == -1) break@loop
             if ('\n'.equals(c.toChar()))
             {
-                y++
-                x = -1
+                x++
+                y = -1
                 trees.add(ArrayList<Tree>())
                 continue@loop
             }
-            x++
-            trees.last().add(Tree(Pair(x,y), c.toChar().digitToInt()))
-            println(trees.last().last())
+            y++
+            trees.last().add(Tree(x,y, c.toChar().digitToInt()))
         }
     }
+    parseVisibility(trees)
     printTreeMap(trees)
+
+    println("-----\nPart1: ${part1(trees)}")
 }
 
     fun printTreeMap(trees: ArrayList<ArrayList<Tree>>) {
-    trees.forEach { row ->
-        row.forEach{tree ->
-            print(tree.height)
+        trees.forEach { row ->
+            row.forEach { tree ->
+                if (tree != row.first()) print(".")
+                print("${tree.height}${if (isVisible(tree))"v" else "n"}")
+            }
+            println()
         }
-        println()
     }
 
     fun parseVisibility(trees: ArrayList<ArrayList<Tree>>) {
         trees.forEach { row ->
             row.forEach { tree ->
-                print(tree.height)
+                VISIBILITY_PATH.values().forEach{
+                    tree.visibility[it] = true
+                }
             }
-            println()
+        }
+
+        //For each tree
+        trees.forEach { row ->
+            row.forEach { tree ->
+                //compare against each tree in the 2d map
+                trees.forEach { row ->
+                    row.forEach { outerTree ->
+                        if (tree.x == outerTree.x)
+                            if (tree.y < outerTree.y){
+                                if (tree.height <= outerTree.height) {
+                                    tree.visibility[VISIBILITY_PATH.FROM_BOTTOM] = false
+                                }
+                            } else if (tree.y > outerTree.y) {
+                                if (tree.height <= outerTree.height) {
+                                    tree.visibility[VISIBILITY_PATH.FROM_TOP] = false
+                                }
+                            }
+                        if (tree.y == outerTree.y)
+                            if (tree.x < outerTree.x){
+                                if (tree.height <= outerTree.height) {
+                                    tree.visibility[VISIBILITY_PATH.FROM_RIGHT] = false
+                                }
+                            } else if (tree.x > outerTree.x) {
+                                if (tree.height <= outerTree.height) {
+                                    tree.visibility[VISIBILITY_PATH.FROM_LEFT] = false
+                                }
+                            }
+                    }
+                }
+            }
         }
     }
+
+fun isVisible(tree: Tree): Boolean {
+    return tree.visibility.any{
+        it.value
+    }
+}
+
+fun part1(trees: ArrayList<ArrayList<Tree>>): Int{
+    var visibleTreeCount = 0
+    trees.forEach{ row ->
+        visibleTreeCount +=
+        row.count{ tree ->
+            isVisible(tree)
+        }
+    }
+    return visibleTreeCount
 }
